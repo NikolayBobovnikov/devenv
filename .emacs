@@ -313,3 +313,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 
 ;;TODO: autopair
+
+
+(provide '.emacs)
+;;; .emacs ends here
