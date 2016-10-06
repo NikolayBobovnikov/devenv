@@ -1,0 +1,85 @@
+#!/bin/bash
+#qt-sdk libboost-all-dev libgtest-dev libopencv-dev libogre-1.9-dev ogre-1.9-tools libbullet-dev nvidia-cuda-toolkit ddclient libc++-dev\
+sudo -S apt-get install -y aptitude
+sudo -S aptitude update
+sudo -S aptitude full-upgrade -y
+sudo -S aptitude install -y --with-recommends \
+wine autoconf automake pkg-config gdebi unzip openjdk-8-jdk \
+python-dev libpython-dev python3-dev libpython3-dev python-numpy python3-numpy \
+checkinstall git mercurial subversion vim emacs xsel xclip tmux zsh mc openvpn \
+make cmake build-essential valgrind ddd doxygen exuberant-ctags \
+clang libclang-dev clang-rename clang-tidy clang-format \
+nvidia-cg-toolkit \
+gcc-arm-none-eabi gdb-arm-none-eabi \
+
+#libraries
+sudo -S aptitude install -y --with-recommends \
+libboost-all-dev libgtest-dev \ 
+libeigen3-dev libflann-dev libtbb-dev libpoco-dev libcppunit-dev
+
+#other libraries
+sudo -S aptitude install -y --with-recommends \
+libtinyxml-dev \
+libgtk-3-dev libvtk6-dev libdc1394-22-dev libdc1394-utils libjpeg-dev libpng12-dev libjasper-dev \
+libavcodec-dev libavformat-dev libavdevice-dev libavutil-dev libv4l-dev v4l-utils \
+libswscale-dev libfaac-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
+libtheora-dev libvorbis-dev libxvidcore-dev x264 libgstreamer-plugins-bad1.0-dev \
+libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev \
+libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libgstreamer-plugins-bad0.10-dev \
+libxaw7-dev libva-dev libvdpau-dev libx11-dev libxfixes-dev texi2html yasm zlib1g-dev \
+libgtkglext1-dev libglm-dev libglu-dev freeglut3-dev libglew-dev libglu1-mesa-dev \
+libxi-dev libx11-dev libxmu-dev libxmuu-dev libhidapi-dev libudev-dev libbluetooth-dev \
+libzzip-dev libfreeimage-dev libopenexr-dev libx264-dev sphinx-common texlive-latex-extra \
+libass-dev libfreetype6-dev libgpac-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev \
+libvorbis-dev libx11-dev libxext-dev libxfixes-dev texi2html zlib1g-dev
+
+#window managers
+sudo -S aptitude install -y --with-recommends awesome
+
+#programs
+#kicad geda ltspice ngspice freecad openscad 
+#octave scilab anaconda3 
+#qt-creator eclipse code-blocks
+sudo add-apt-repository --yes ppa:js-reynaud/kicad-4
+sudo aptitude update
+sudo aptitude install -y --with-recommends kicad kicad-library kicad-doc-en
+
+sudo aptitude install -y --with-recommends geda octave scilab 
+
+#sudo -S aptitude install -y openssh-server xrdp xfce4 mc vsftpd xmonad suckless-tools
+#REMAINING: ffmpeg, opencv, cuda toolkit 
+#sudo gdebi --n ~/distr/deb/cuda-repo-ubuntu1410-7-0-rc_7.0-18_amd64.deb
+#sudo aptitude update
+#sudo aptitude install cuda
+#sudo gdebi --n ~/distr/deb/ffmpeg_2.2.12-1_amd64.deb 
+#sudo gdebi --n ~/distr/deb/libopencv_3.0.0-1_amd64.deb 
+
+#requirements for osrm
+sudo aptitude install -y --with-recommends libbz2-dev libstxxl-dev libstxxl1v5 libxml2-dev \ 
+libzip-dev lua5.1 liblua5.1-0-dev libluabind-dev
+
+#install other: cloud disk, web browser, etc
+#sudo gdebi --n ~/distr/deb/yandex-scdisk_latest_amd65.deb 
+
+# Setup git (username, email, etc)
+git config --global user.name "Nikolay Bobovnikov"
+git config --global user.email nbobovnikov@gmail.com
+
+
+# Setup C++ dev environment
+# rtags
+git clone --recursive https://github.com/Andersbakken/rtags.git && \
+cd rtags && mkdir build && cd build && \
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && \
+sudo -S checkinstall --install=yes --default --pkgname=rtags && \
+sudo -S dpkg -i rtags*.deb && \
+cd ../../ && rm -fr rtags
+
+
+# cmake - download and install version newer than 3.0 required by rtags
+mkdir -p cmake_tmp && cd cmake_tmp && \
+wget --no-clobber  http://www.cmake.org/files/v3.7/cmake-3.7.0-rc1.tar.gz && \
+tar -xf cmake*.tar.gz && cd cmake* && \
+./bootstrap && make && sudo checkinstall --default --pkgname=cmake --pkgversion=3.7.0 && \
+sudo dpkg -i cmake*.deb && \
+cd ../../../ && rm -fr cmake_tmp
