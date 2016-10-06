@@ -49,11 +49,11 @@ re-downloaded in order to locate PACKAGE."
     ;smart-mode-line
     ;
     ;;;;; UI
-    ;indent-guide
+    indent-guide
     ;yascroll
     ;highlight-symbol
     ;smooth-scroll
-    ;nlinum
+    nlinum
     ;
     ;;;;; ido, ~M-x~
     ;flx-ido
@@ -81,9 +81,12 @@ re-downloaded in order to locate PACKAGE."
     cmake-ide
     rtags
     key-chord
+    smartparens ;https://github.com/Fuco1/smartparens
     vimish-fold
     irony
+    company-irony
     clang-format
+    srefactor
     
     ;;;;; Dired
     ;dired+
@@ -100,10 +103,10 @@ re-downloaded in order to locate PACKAGE."
     ;git-gutter
     ;
     ;;;;; Projectile
-    ;projectile
-    ;flx
-    ;project-explorer
-    ;nameframe-projectile
+    projectile
+    flx
+    project-explorer
+    nameframe-projectile
     ;
     ;;;;; Perspective
     ;perspective
@@ -173,6 +176,29 @@ re-downloaded in order to locate PACKAGE."
 
 (install-my-packages)
 
+(require 'indent-guide)
+
+;; don't show toolbar
+(tool-bar-mode -1)
+
+;; highlight matching parentheses
+(show-paren-mode 1)
+
+;; show line numbers (use nlinum-mode; linum-mode is slow)
+(global-nlinum-mode)
+
+;; show column number in mode-line
+(column-number-mode)
+
+(setq inhibit-splash-screen t)
+
+(setq-default indicate-empty-lines t)
+
+
+
+
+
+
 
 
 ;; flycheck
@@ -209,6 +235,9 @@ re-downloaded in order to locate PACKAGE."
 (add-hook 'c-mode-hook 'irony-mode)
 (add-hook 'objc-mode-hook 'irony-mode)
 
+(eval-after-load 'company  '(add-to-list 'company-backends 'company-irony))
+
+
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
 (defun my-irony-mode-hook ()
@@ -220,6 +249,15 @@ re-downloaded in order to locate PACKAGE."
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 ;; end configure irony mode ==============================================
 
+; semantic refactoring
+(require 'srefactor)
+(require 'srefactor-lisp)
+
+;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++. 
+(semantic-mode 1) ;; -> this is optional for Lisp
+
+(define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+(define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
 
 ; evil mode
 (require 'evil)
@@ -264,8 +302,13 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;    (highlight-parentheses-mode t)))
 ;(global-highlight-parentheses-mode t)
 
-(setq show-paren-delay 0)
+(setq show-paren-delay 0.01)
 (show-paren-mode 1)
+
+(require 'smartparens-config)
+(add-hook 'c++-mode-hook #'smartparens-mode)
+(add-hook 'c-mode-hook #'smartparens-mode)
+
 
 ;; folding
 (require 'vimish-fold)
