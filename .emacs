@@ -104,7 +104,8 @@ re-downloaded in order to locate PACKAGE."
     ;;;;; Projectile
     ;projectile
     ;flx
-    ;project-explorer
+    project-explorer
+    neotree
     ;nameframe-projectile
     ;
     ;;;;; Perspective
@@ -222,6 +223,17 @@ re-downloaded in order to locate PACKAGE."
 (load-theme 'tsdh-dark)
 
 
+;;; reload file (revert)
+(global-auto-revert-mode 1)
+(setq auto-revert-verbose nil)
+(global-set-key (kbd "<f5>") 'revert-buffer)
+
+;revert without asking confirmation: http://stackoverflow.com/questions/6591043/how-to-answer-yes-or-no-automatically-in-emacs
+(defadvice revert-buffer (around stfu activate)
+      (cl-flet ((yes-or-no-p (&rest args) t)
+             (y-or-n-p (&rest args) t))
+        ad-do-it))
+
 ;; store all backup and autosave files in the tmp dir
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
@@ -233,7 +245,6 @@ re-downloaded in order to locate PACKAGE."
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
 (add-hook 'objc-mode-hook 'irony-mode)
-
 (eval-after-load 'company  '(add-to-list 'company-backends 'company-irony))
 
 
@@ -282,24 +293,13 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (global-set-key [escape] 'evil-exit-emacs-state)
 
 
-; highlight-parentheses with autopair mode:
-;(add-hook 'highlight-parentheses-mode-hook
-;	  '(lambda ()
-;	     (setq autopair-handle-action-fns
-;		   (aend
-;		    (if autopair-handle-action-fns
-;			autopair-handle-action-fns
-;		      '(autopair-default-handle-action))
-;		    '((lambda (action pair pos-before)
-;			(hl-paren-color-update)))))))
+(setq-default
+ tab-width 4
+ make-backup-files nil
+ indent-tabs-mode nil
+ show-trailing-whitespace t
+ visible-bell nil)
 
-
-;Enables highlight-parentheses-mode on all buers:
-;(define-globalized-minor-mode global-highlight-parentheses-mode
-; highlight-parentheses-mode
-;  (lambda ()
-;    (highlight-parentheses-mode t)))
-;(global-highlight-parentheses-mode t)
 
 (setq show-paren-delay 0.01)
 (show-paren-mode 1)
