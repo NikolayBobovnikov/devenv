@@ -3,19 +3,18 @@
 ;;; Code:
 
 (require 'package)
-  (push '("marmalade" . "http://marmalade-repo.org/packages/")
-        package-archives )
-  (push '("melpa" . "http://melpa.milkbox.net/packages/")
+  (push '("gnu" . "http://elpa.gnu.org/packages/")
         package-archives)
-  (package-initialize)
+      			       
+;Apparently needed for the package auto-complete (why?)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-(when (>= emacs-major-version 24)
-    (require 'package)
-    (package-initialize)
-      (add-to-list
-           'package-archives
-              '("melpa" . "http://melpa.org/packages/")
-	      t))
+
+(package-initialize)
+(setq url-http-attempt-keepalives nil)
+(when (not package-archive-contents)
+    (package-refresh-contents))
 
 
 ;; Define install-package for easier installing of packages.
@@ -103,10 +102,10 @@ re-downloaded in order to locate PACKAGE."
     ;git-gutter
     ;
     ;;;;; Projectile
-    projectile
-    flx
-    project-explorer
-    nameframe-projectile
+    ;projectile
+    ;flx
+    ;project-explorer
+    ;nameframe-projectile
     ;
     ;;;;; Perspective
     ;perspective
