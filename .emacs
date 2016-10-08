@@ -222,6 +222,8 @@ re-downloaded in order to locate PACKAGE."
 ;;(load-theme 'solarized t)
 (load-theme 'tsdh-dark)
 
+;;; start with file tree view
+(neotree)
 
 ;;; reload file (revert)
 (global-auto-revert-mode 1)
