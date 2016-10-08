@@ -185,7 +185,25 @@ re-downloaded in order to locate PACKAGE."
 (show-paren-mode 1)
 
 ;; show line numbers (use nlinum-mode; linum-mode is slow)
-(global-nlinum-mode)
+;;(global-nlinum-mode)
+(defconst modi/linum-mode-hooks '(verilog-mode-hook
+                                  emacs-lisp-mode-hook
+                                  cperl-mode-hook
+                                  c-mode-hook
+                                  python-mode-hook
+                                  matlab-mode-hook
+                                  sh-mode-hook
+                                  web-mode-hook
+                                  html-mode-hook
+                                  css-mode-hook
+                                  makefile-gmake-mode-hook
+                                  tcl-mode-hook)
+  "List of hooks of major modes in which a linum mode should be enabled.")
+(when global-linum-mode
+      (global-nlinum-mode -1))
+(dolist (hook modi/linum-mode-hooks)
+      (add-hook hook #'nlinum-mode))
+
 
 ;; show column number in mode-line
 (column-number-mode)
