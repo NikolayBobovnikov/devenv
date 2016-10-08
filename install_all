@@ -8,7 +8,7 @@ wine autoconf automake pkg-config gdebi unzip openjdk-8-jdk \
 python-dev libpython-dev python3-dev libpython3-dev python-numpy python3-numpy \
 checkinstall git mercurial subversion vim emacs xsel xclip tmux zsh mc openvpn \
 make cmake build-essential valgrind ddd doxygen exuberant-ctags \
-clang libclang-dev clang-rename clang-tidy clang-format \
+clang libclang-dev clang-rename clang-tidy clang-format lldb \
 nvidia-cg-toolkit \
 gcc-arm-none-eabi gdb-arm-none-eabi \
 
