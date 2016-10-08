@@ -86,7 +86,8 @@ re-downloaded in order to locate PACKAGE."
     company-irony
     clang-format
     srefactor
-    
+    cmake-font-lock
+
     ;;;;; Dired
     ;dired+
     ;
@@ -241,7 +242,7 @@ re-downloaded in order to locate PACKAGE."
 (load-theme 'tsdh-dark)
 
 ;;; start with file tree view
-(neotree)
+;(neotree)
 
 ;;; reload file (revert)
 (global-auto-revert-mode 1)
@@ -267,7 +268,6 @@ re-downloaded in order to locate PACKAGE."
 (add-hook 'objc-mode-hook 'irony-mode)
 (eval-after-load 'company  '(add-to-list 'company-backends 'company-irony))
 
-
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
 (defun my-irony-mode-hook ()
@@ -277,7 +277,10 @@ re-downloaded in order to locate PACKAGE."
     'irony-completion-at-point-async))
 (add-hook 'irony-mode-hook 'my-irony-mode-hook)
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-;; end configure irony mode ==============================================
+
+;enable company mode
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ; semantic refactoring
 (require 'srefactor)
@@ -317,7 +320,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
  tab-width 4
  make-backup-files nil
  indent-tabs-mode nil
- show-trailing-whitespace t
+ ;show-trailing-whitespace t
  visible-bell nil)
 
 
@@ -330,12 +333,22 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 
 ;; folding
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
 (require 'vimish-fold)
-(vimish-fold-global-mode 1)
+;(vimish-fold-global-mode 1)
 
 (require 'evil-vimish-fold)
 (evil-vimish-fold-mode 1)
 
+; enable hideshow minor mode in all programming modes
+(setq evil-fold-list (remove-if (lambda (e) (eq (caar e) 'hs-minor-mode)) evil-fold-list))
+(add-to-list 'evil-fold-list '((hs-minor-mode) ...)) 
+
+
+
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
 
 (require 'clang-format)
 (global-set-key [C-M-tab] 'clang-format-region)
@@ -350,26 +363,29 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'key-chord)
 (key-chord-mode 1)
 
+(local-set-key [tab] 'tab-to-tab-stop)
+(local-set-key (kbd "TAB") 'tab-to-tab-stop)
 
 ;; goto definition
-(key-chord-define-global "ff" 'rtags-find-symbol-at-point)
+(global-set-key (kbd "C-S-f") 'rtags-find-symbol-at-point)
 
 ;; rename
 ;;(global-set-key (kbd "n") 'nil)
-(key-chord-define-global "rr" 'rtags-rename-symbol)
+(global-set-key (kbd "C-S-r") 'rtags-rename-symbol)
 
 ;; find all references
 (key-chord-define-global "fr" 'rtags-find-all-references-at-point)
 
 ;; goto next reference
-(key-chord-define-global "nn" 'rtags-next-match)
+(global-set-key (kbd "C-n")  'rtags-next-match)
 
 ;; goto prev reference
-(key-chord-define-global "pp" 'rtags-next-match)
+(global-set-key (kbd "C-p") 'rtags-next-match)
 
 ;; folding
-;;(global-set-key (kbd "M-0") 'vimish-fold-toggle)
-;;(key-chord-define-global "za" 'vimish-fold)
+(global-set-key (kbd "C-`") 'hs-toggle-hiding)
+(global-set-key (kbd "M-0") 'hs-hide-all)
+(global-set-key (kbd "M-9") 'hs-show-all)
 
 
 
