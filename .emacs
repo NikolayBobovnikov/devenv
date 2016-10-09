@@ -32,6 +32,7 @@ re-downloaded in order to locate PACKAGE."
         (package-refresh-contents)
         (install-package package min-version t)))))
 
+;(package-refresh-contents)
 
 (defvar my-packages
   '(;;;; Misc
@@ -55,11 +56,11 @@ re-downloaded in order to locate PACKAGE."
     nlinum
     ;
     ;;;;; ido, ~M-x~
-    ;flx-ido
-    ;ido-ubiquitous
-    ;smex
-    ;idomenu
-    ;ido-vertical-mode
+    flx-ido
+    ido-ubiquitous
+    smex
+    idomenu
+    ido-vertical-mode
     ;
     ;;;;; Window and frame management
     ;buffer-move
@@ -84,6 +85,8 @@ re-downloaded in order to locate PACKAGE."
     vimish-fold
     irony
     company-irony
+    ycmd
+    company-ycmd
     clang-format
     srefactor
     cmake-font-lock
@@ -103,11 +106,11 @@ re-downloaded in order to locate PACKAGE."
     ;git-gutter
     ;
     ;;;;; Projectile
-    ;projectile
-    ;flx
+    projectile
+    flx
     project-explorer
     neotree
-    ;nameframe-projectile
+    nameframe-projectile
     ;
     ;;;;; Perspective
     ;perspective
@@ -172,6 +175,7 @@ re-downloaded in order to locate PACKAGE."
 
 ;; loop over my-packages and install them
 (defun install-my-packages ()
+  ;my interactive install package function
   (interactive)
   (mapc 'install-package my-packages))
 
@@ -187,9 +191,7 @@ re-downloaded in order to locate PACKAGE."
 
 ;; show line numbers (use nlinum-mode; linum-mode is slow)
 ;;(global-nlinum-mode)
-(defconst modi/linum-mode-hooks '(verilog-mode-hook
-                                  emacs-lisp-mode-hook
-                                  cperl-mode-hook
+(defconst modi/linum-mode-hooks '(emacs-lisp-mode-hook
                                   c-mode-hook
                                   python-mode-hook
                                   matlab-mode-hook
@@ -213,7 +215,8 @@ re-downloaded in order to locate PACKAGE."
 
 (setq-default indicate-empty-lines t)
 
-
+; nerdcommenter
+(evilnc-default-hotkeys)
 
 
 
@@ -260,6 +263,33 @@ re-downloaded in order to locate PACKAGE."
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
+
+
+;;;;;;; UI ;;;;;;;;
+; from enberg on #emacs
+(setq compilation-finish-function
+  (lambda (buf str)
+    (if (null (string-match ".*exited abnormally.*" str))
+        ;;no errors, make the compilation window go away in a few seconds
+        (progn
+          (run-at-time
+           "2 sec" nil 'delete-windows-on
+           (get-buffer-create "*compilation*"))
+          (message "No Compilation Errors!")))))
+
+
+; push semicolon in the end of string
+(defun maio/electric-semicolon ()
+  (interactive)
+  (end-of-line)
+  (when (not (looking-back ";"))
+    (insert ";")))
+(define-key c-mode-map ";" 'maio/electric-semicolon)
+(define-key c++-mode-map ";" 'maio/electric-semicolon)
+
+; snippets
+(add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippets/")
+(yas-global-mode t)
 
 
 ;; configure irony mode ================================================
@@ -323,6 +353,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
  ;show-trailing-whitespace t
  visible-bell nil)
 
+; Ctrl-C Ctrl-V
+;(cua-mode t)
+;(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+;(transient-mark-mode 1) ;; No region when it is not highlighted
+;(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
+
 
 (setq show-paren-delay 0.01)
 (show-paren-mode 1)
@@ -345,7 +381,9 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (setq evil-fold-list (remove-if (lambda (e) (eq (caar e) 'hs-minor-mode)) evil-fold-list))
 (add-to-list 'evil-fold-list '((hs-minor-mode) ...)) 
 
-
+; buffer navigation
+(require 'ido)
+(ido-mode t)
 
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
@@ -357,6 +395,16 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'rtags)
 (cmake-ide-setup)
 
+; comletion with rtags
+;(require 'rtags)
+;(require 'company)
+;(setq rtags-autostart-diagnostics t)
+;(rtags-diagnostics)
+;(setq rtags-completions-enabled t)
+;(push 'company-rtags company-backends)
+;(global-company-mode)
+;(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+
 ;; mapping for commands
 
 ;;load a file named key-chord.el from some directory in the load-path (e.g. "~/.emacs.d")
@@ -367,7 +415,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (local-set-key (kbd "TAB") 'tab-to-tab-stop)
 
 ;; goto definition
-(global-set-key (kbd "C-S-f") 'rtags-find-symbol-at-point)
+(global-set-key (kbd "<f2>") 'rtags-find-symbol-at-point)
+(global-set-key (kbd "<f3>") 'ff-find-other-file)
 
 ;; rename
 ;;(global-set-key (kbd "n") 'nil)
@@ -377,10 +426,10 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (key-chord-define-global "fr" 'rtags-find-all-references-at-point)
 
 ;; goto next reference
-(global-set-key (kbd "C-n")  'rtags-next-match)
+(key-chord-define-global "f,"  'rtags-next-match)
 
 ;; goto prev reference
-(global-set-key (kbd "C-p") 'rtags-next-match)
+(key-chord-define-global "f." 'rtags-next-match)
 
 ;; folding
 (global-set-key (kbd "C-`") 'hs-toggle-hiding)
