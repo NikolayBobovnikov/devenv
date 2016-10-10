@@ -284,12 +284,13 @@ re-downloaded in order to locate PACKAGE."
   (end-of-line)
   (when (not (looking-back ";"))
     (insert ";")))
-(define-key c-mode-map ";" 'maio/electric-semicolon)
-(define-key c++-mode-map ";" 'maio/electric-semicolon)
+(global-set-key ";" 'maio/electric-semicolon)
+;(define-key c++-mode-map ";" 'maio/electric-semicolon)
+;(eval-after-load 'latex '(define-key LaTeX-mode-map [(tab)] 'outline-cycle)))
 
 ; snippets
-(add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippets/")
-(yas-global-mode t)
+;(add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippets/")
+;(yas-global-mode t)
 
 
 ;; configure irony mode ================================================
