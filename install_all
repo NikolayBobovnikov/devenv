@@ -6,7 +6,7 @@ sudo -S aptitude full-upgrade -y
 sudo -S aptitude install -y --with-recommends \
 wine autoconf automake pkg-config gdebi unzip openjdk-8-jdk \
 python-dev libpython-dev python3-dev libpython3-dev python-numpy python3-numpy \
-checkinstall git mercurial subversion vim emacs xsel xclip tmux zsh mc openvpn \
+checkinstall git mercurial subversion vim xsel xclip tmux zsh mc openvpn \
 make cmake build-essential valgrind ddd doxygen exuberant-ctags \
 clang libclang-dev clang-rename clang-tidy clang-format lldb \
 nvidia-cg-toolkit \
@@ -83,3 +83,10 @@ tar -xf cmake*.tar.gz && cd cmake* && \
 ./bootstrap && make && sudo checkinstall --default --pkgname=cmake --pkgversion=3.7.0 && \
 sudo dpkg -i cmake*.deb && \
 cd ../../../ && rm -fr cmake_tmp
+
+# get latest and greatest emacs
+mkdir -p emacs_tmp && cd emacs_tmp && \
+wget --no-clobber  mirror.tochlab.net/pub/gnu/emacs/emacs-25.1.tar.gz  && \
+tar -xf emacs*.tar.gz && cd emacs* && \
+./configure && make && sudo checkinstall --default --pkgname=emacs --pkgversion=24.1 && \
+cd ../../ &&  sudo rm -fr emacs_tmp 
