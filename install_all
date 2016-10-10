@@ -77,16 +77,29 @@ cd ../../ && rm -fr rtags
 
 
 # cmake - download and install version newer than 3.0 required by rtags
-mkdir -p cmake_tmp && cd cmake_tmp && \
-wget --no-clobber  http://www.cmake.org/files/v3.7/cmake-3.7.0-rc1.tar.gz && \
-tar -xf cmake*.tar.gz && cd cmake* && \
-./bootstrap && make && sudo checkinstall --default --pkgname=cmake --pkgversion=3.7.0 && \
-sudo dpkg -i cmake*.deb && \
-cd ../../../ && rm -fr cmake_tmp
+if [ $(dpkg-query -W -f='${Status}' cmake 2>/dev/null | grep -c "ok installed") -eq 0  ];
+then
+  echo "No cmake. Setting up cmake."
+  mkdir -p cmake_tmp && cd cmake_tmp && \
+  wget --no-clobber  http://www.cmake.org/files/v3.7/cmake-3.7.0-rc1.tar.gz && \
+  tar -xf cmake*.tar.gz && cd cmake* && \
+  ./bootstrap && make && sudo checkinstall --default --pkgname=cmake --pkgversion=3.7.0 && \
+  sudo dpkg -i cmake*.deb && \
+  cd ../../../ && rm -fr cmake_tmp
+fi
 
 # get latest and greatest emacs
-mkdir -p emacs_tmp && cd emacs_tmp && \
-wget --no-clobber  mirror.tochlab.net/pub/gnu/emacs/emacs-25.1.tar.gz  && \
-tar -xf emacs*.tar.gz && cd emacs* && \
-./configure && make && sudo checkinstall --default --pkgname=emacs --pkgversion=24.1 && \
-cd ../../ &&  sudo rm -fr emacs_tmp 
+if [ $(dpkg-query -W -f='${Status}' emacs 2>/dev/null | grep -c "ok installed") -eq 0  ];
+then
+  echo "Setting up emacs."
+  mkdir -p emacs_tmp && cd emacs_tmp && \
+  wget --no-clobber  mirror.tochlab.net/pub/gnu/emacs/emacs-25.1.tar.gz  && \
+  tar -xf emacs*.tar.gz && cd emacs* && \
+  ./configure && make && sudo checkinstall --default --pkgname=emacs --pkgversion=24.1 && \
+  cd ../../ &&  sudo rm -fr emacs_tmp 
+fi
+
+
+
+
+
