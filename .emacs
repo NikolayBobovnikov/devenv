@@ -288,11 +288,6 @@ re-downloaded in order to locate PACKAGE."
 ;(define-key c++-mode-map ";" 'maio/electric-semicolon)
 ;(eval-after-load 'latex '(define-key LaTeX-mode-map [(tab)] 'outline-cycle)))
 
-; snippets
-;(add-to-list 'yas-snippet-dirs "~/.emacs.d/yasnippets/")
-;(yas-global-mode t)
-
-
 ;; configure irony mode ================================================
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
@@ -367,6 +362,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'smartparens-config)
 (add-hook 'c++-mode-hook #'smartparens-mode)
 (add-hook 'c-mode-hook #'smartparens-mode)
+(add-hook 'lisp-mode-hook #'smartparens-mode)
 
 
 ;; folding
@@ -397,14 +393,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (cmake-ide-setup)
 
 ; comletion with rtags
-;(require 'rtags)
-;(require 'company)
-;(setq rtags-autostart-diagnostics t)
-;(rtags-diagnostics)
-;(setq rtags-completions-enabled t)
-;(push 'company-rtags company-backends)
-;(global-company-mode)
-;(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+(require 'rtags)
+(require 'company)
+(setq rtags-autostart-diagnostics t)
+(rtags-diagnostics)
+(setq rtags-completions-enabled t)
+(push 'company-rtags company-backends)
+(global-company-mode)
+(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
 
 ;; mapping for commands
 
@@ -433,10 +429,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (key-chord-define-global "f." 'rtags-next-match)
 
 ;; folding
-(global-set-key (kbd "C-`") 'hs-toggle-hiding)
+(global-set-key (kbd "C-S-c") 'hs-toggle-hiding)
 (global-set-key (kbd "M-0") 'hs-hide-all)
 (global-set-key (kbd "M-9") 'hs-show-all)
 
+;; build
+(global-set-key (kbd "<f7>") 'cmake-ide-compile)
 
 
 

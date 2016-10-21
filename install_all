@@ -34,7 +34,7 @@ libass-dev libfreetype6-dev libgpac-dev libsdl1.2-dev libtheora-dev libtool libv
 libvorbis-dev libx11-dev libxext-dev libxfixes-dev texi2html zlib1g-dev
 
 #window managers
-sudo -S aptitude install -y --with-recommends awesome
+sudo -S aptitude install -y --with-recommends awesome i3
 
 #programs
 #kicad geda ltspice ngspice freecad openscad 
