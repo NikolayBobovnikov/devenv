@@ -90,6 +90,7 @@ re-downloaded in order to locate PACKAGE."
     clang-format
     srefactor
     cmake-font-lock
+    yasnippet
 
     ;;;;; Dired
     ;dired+
@@ -189,8 +190,17 @@ re-downloaded in order to locate PACKAGE."
 ;; highlight matching parentheses
 (show-paren-mode 1)
 
-;; show line numbers (use nlinum-mode; linum-mode is slow)
-;;(global-nlinum-mode)
+;; set default font size
+(set-face-attribute 'default nil :height 150)
+
+
+;; Options for tabs
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4) ; or any other preferred value
+    (defvaralias 'c-basic-offset 'tab-width)
+    (defvaralias 'cperl-indent-level 'tab-width)
+                                             
+
 (defconst modi/linum-mode-hooks '(emacs-lisp-mode-hook
                                   c-mode-hook
                                   python-mode-hook
@@ -219,16 +229,40 @@ re-downloaded in order to locate PACKAGE."
 (evilnc-default-hotkeys)
 
 
+;;; yasnippet
+;;; should be loaded before auto complete so that they can work together
+(require 'yasnippet)
+(yas-global-mode 1)
+;;; auto complete mod
+;;; should be loaded after yasnippet so that they can work together
+;(require 'auto-complete-config)
+;(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+;(ac-config-default)
+;;; set the trigger key so that it can work together with yasnippet on tab key,
+;;; if the word exists in yasnippet, pressing tab will cause yasnippet to
+;;; activate, otherwise, auto-complete will
+;(ac-set-trigger-key "TAB")
+;(ac-set-trigger-key "<tab>")
 
 
+;; place semicolon at the end of string
+(defun maio/electric-semicolon ()
+  (interactive)
+  (end-of-line)
+  (when (not (looking-back ";"))
+    (insert ";"))
+  (newline)
+  (indent-according-to-mode))
+
+;(global-set-key  ";" 'maio/electric-semicolon)
+;(eval-after-load 'c-mode '(define-key c-mode-map (kbd ";") 'maio/electric-semicolon))
+;(eval-after-load 'c++-mode '(define-key c++-mode-map (kbd ";") 'maio/electric-semicolon))
 
 
 ;; flycheck
 ;;(package-refresh-contents)
 ;;(package-install 'flycheck)
 (global-flycheck-mode)
-
-
 
 ;;reload local dir variables when saved
 (add-hook 'emacs-lisp-mode-hook
@@ -243,27 +277,14 @@ re-downloaded in order to locate PACKAGE."
 (add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized/")
 ;;(load-theme 'solarized t)
 (load-theme 'tsdh-dark)
+(set-face-attribute 'region nil :background "#666")
 
 ;;; start with file tree view
 ;(neotree)
 
-;;; reload file (revert)
-(global-auto-revert-mode 1)
-(setq auto-revert-verbose nil)
-(global-set-key (kbd "<f5>") 'revert-buffer)
 
-;revert without asking confirmation: http://stackoverflow.com/questions/6591043/how-to-answer-yes-or-no-automatically-in-emacs
-(defadvice revert-buffer (around stfu activate)
-      (cl-flet ((yes-or-no-p (&rest args) t)
-             (y-or-n-p (&rest args) t))
-        ad-do-it))
-
-;; store all backup and autosave files in the tmp dir
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
-
+;; revert buffers when files are updated
+(global-auto-revert-mode t)
 
 ;;;;;;; UI ;;;;;;;;
 ; from enberg on #emacs
@@ -278,35 +299,6 @@ re-downloaded in order to locate PACKAGE."
           (message "No Compilation Errors!")))))
 
 
-; push semicolon in the end of string
-(defun maio/electric-semicolon ()
-  (interactive)
-  (end-of-line)
-  (when (not (looking-back ";"))
-    (insert ";")))
-(global-set-key ";" 'maio/electric-semicolon)
-;(define-key c++-mode-map ";" 'maio/electric-semicolon)
-;(eval-after-load 'latex '(define-key LaTeX-mode-map [(tab)] 'outline-cycle)))
-
-;; configure irony mode ================================================
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'objc-mode-hook 'irony-mode)
-(eval-after-load 'company  '(add-to-list 'company-backends 'company-irony))
-
-;; replace the `completion-at-point' and `complete-symbol' bindings in
-;; irony-mode's buffers by irony-mode's function
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async))
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-;enable company mode
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
 
 ; semantic refactoring
 (require 'srefactor)
@@ -314,9 +306,6 @@ re-downloaded in order to locate PACKAGE."
 
 ;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++. 
 (semantic-mode 1) ;; -> this is optional for Lisp
-
-(define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
-(define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
 
 ; evil mode
 (require 'evil)
@@ -341,13 +330,17 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 (global-set-key [escape] 'evil-exit-emacs-state)
 
+;; set tab 4 spaces
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
 
-(setq-default
- tab-width 4
- make-backup-files nil
- indent-tabs-mode nil
- ;show-trailing-whitespace t
- visible-bell nil)
+;(setq-default
+; tab-width 4
+; make-backup-files nil
+; indent-tabs-mode nil
+; ;show-trailing-whitespace t
+; visible-bell nil)
 
 ; Ctrl-C Ctrl-V
 ;(cua-mode t)
@@ -388,19 +381,52 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (require 'clang-format)
 (global-set-key [C-M-tab] 'clang-format-region)
 
+
+;enable company mode
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+
 ;; cmake-ide for C++
 (require 'rtags)
 (cmake-ide-setup)
 
-; comletion with rtags
-(require 'rtags)
-(require 'company)
+;; ensure that we use only rtags checking
+;; https://github.com/Andersbakken/rtags#optional-1
+(defun setup-flycheck-rtags ()
+  (interactive)
+  (flycheck-select-checker 'rtags)
+  ;; RTags creates more accurate overlays.
+  (setq-local flycheck-highlighting-mode nil)
+  (setq-local flycheck-check-syntax-automatically nil))
+
+;refactoring and completion with rtags
 (setq rtags-autostart-diagnostics t)
 (rtags-diagnostics)
 (setq rtags-completions-enabled t)
 (push 'company-rtags company-backends)
-(global-company-mode)
 (define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+;; use rtags flycheck mode -- clang warnings shown inline
+(require 'flycheck-rtags)
+;; c-mode-common-hook is also called by c++-mode
+(add-hook 'c-mode-common-hook #'setup-flycheck-rtags)
+
+    
+;; completion with irony mode 
+;(add-hook 'c++-mode-hook 'irony-mode)
+;(add-hook 'c-mode-hook 'irony-mode)
+;(add-hook 'objc-mode-hook 'irony-mode)
+;(eval-after-load 'company  '(add-to-list 'company-backends 'company-irony))
+;;; replace the `completion-at-point' and `complete-symbol' bindings in
+;;; irony-mode's buffers by irony-mode's function
+;(defun my-irony-mode-hook ()
+;  (define-key irony-mode-map [remap completion-at-point]
+;    'irony-completion-at-point-async)
+;  (define-key irony-mode-map [remap complete-symbol]
+;    'irony-completion-at-point-async))
+;(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+;(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+;(push 'company-irony company-backends)
+
 
 ;; mapping for commands
 
@@ -435,6 +461,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 ;; build
 (global-set-key (kbd "<f7>") 'cmake-ide-compile)
+
+(key-chord-define-global ";;" 'maio/electric-semicolon)
+
+; srefactor
+(define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+(define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
 
 
 
