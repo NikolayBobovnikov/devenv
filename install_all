@@ -88,6 +88,9 @@ then
   cd ../../../ && rm -fr cmake_tmp
 fi
 
+# emacs dependencies
+sudo aptitude install -y --with-recommends texinfo libx11-dev libxpm-dev libjpeg-dev libpng-dev libgif-dev libtiff-dev libgtk-3-dev libncurses-dev
+
 # get latest and greatest emacs
 if [ $(dpkg-query -W -f='${Status}' emacs 2>/dev/null | grep -c "ok installed") -eq 0  ];
 then
